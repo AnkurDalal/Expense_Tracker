@@ -1,6 +1,5 @@
-export const BASE_URL = "http://localhost:8000";
+export const BASE_URL = "https://kaleidoscopic-melba-b30ceb.netlify.app";
 
-//utils/apiPaths.js
 export const API_PATHS = {
     AUTH: {
         LOGIN: "/api/v1/auth/login",
@@ -32,6 +31,6 @@ export const API_PATHS = {
         DOWNLOAD_EXPENSE: "/api/v1/expense/downloadexcel"
     },
     IMAGE: {
-        UPLOAD_IMAGE: '/api/v1/auth/upload-image'
+        UPLOAD_IMAGE: "/api/v1/auth/upload-image"
     }
 }

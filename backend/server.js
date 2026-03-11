@@ -1,5 +1,5 @@
 const path = require("path");
-require("dotenv").config({ path: path.join(__dirname, '.env') });
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 
 const express = require("express");
 const cors = require("cors");
@@ -16,7 +16,7 @@ const { generalRateLimit, authRateLimit } = require("./middleware/rateLimitMiddl
 const app = express();
 
 // Connect Database
-connectDb();
+connectDb().catch(console.error);
 
 // Security middleware
 app.use(
@@ -28,21 +28,41 @@ app.use(
         styleSrc: ["'self'", "'unsafe-inline'"],
         scriptSrc: ["'self'"],
         imgSrc: ["'self'", "data:", "https:"],
-        connectSrc: ["'self'", "http://localhost:8000"],
+        connectSrc: ["'self'", "https:", "http:"], // FIXED
       },
     },
   })
 );
 
-// Middleware - CORS
+// CORS middleware
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
+      const allowedOrigins = [
+        "https://kaleidoscopic-melba-b30ceb.netlify.app",
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:5175",
+        "http://localhost:3000"
+      ];
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(null, true); // allow all temporarily
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
     credentials: true,
+    optionsSuccessStatus: 200
   })
 );
+
+// Handle preflight requests
+app.options("*", cors());
 
 // Rate limiting
 app.use("/api/v1/auth", authRateLimit);
@@ -61,7 +81,7 @@ app.use("/api/v1/income", incomeRoutes);
 app.use("/api/v1/expense", expenseRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
 
-// Health check endpoint
+// Health check
 app.get("/api/v1/health", (req, res) => {
   res.status(200).json({
     success: true,
@@ -70,7 +90,7 @@ app.get("/api/v1/health", (req, res) => {
   });
 });
 
-// 404 handler (FIXED)
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -80,7 +100,29 @@ app.use((req, res) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error("Global error handler:", err.stack);
+
+  if (err.name === "ValidationError") {
+    return res.status(400).json({
+      success: false,
+      message: "Validation Error",
+      errors: err.errors,
+    });
+  }
+
+  if (err.name === "CastError") {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid ID format",
+    });
+  }
+
+  if (err.code === 11000) {
+    return res.status(400).json({
+      success: false,
+      message: "Duplicate field value entered",
+    });
+  }
 
   const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -94,6 +136,12 @@ app.use((err, req, res, next) => {
 // Server Start
 const PORT = process.env.PORT || 8000;
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+// Export for Netlify functions
+module.exports = app;
+
+// Run locally
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
