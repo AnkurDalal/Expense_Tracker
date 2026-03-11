@@ -12,7 +12,7 @@ const Input = ({ value, onChange, placeholder, label, type, error, ...props }) =
   return (
     <div className="space-y-2">
       {label && (
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-text-primary">
           {label}
         </label>
       )}
@@ -21,24 +21,27 @@ const Input = ({ value, onChange, placeholder, label, type, error, ...props }) =
         <input
           type={type === "password" ? (showPassword ? "text" : "password") : type}
           placeholder={placeholder}
-          className={`w-full bg-white border-2 transition-all duration-200 focus:outline-none pr-12 ${
+          className={`w-full bg-card border-2 transition-all duration-200 focus:outline-none pr-12 ${
             error 
               ? "border-red-300 focus:border-red-500 focus:ring-red-200" 
               : isFocused 
                 ? "border-primary focus:border-primary focus:ring-primary/20" 
-                : "border-gray-200 focus:border-primary focus:ring-primary/20"
+                : "border-border focus:border-primary focus:ring-primary/20"
           }`}
           value={value}
           onChange={(e) => onChange(e)}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
+          style={{
+            color: value ? (props.isDarkMode ? 'red' : 'inherit') : 'inherit'
+          }}
           {...props}
         />
 
         {type === "password" && (
           <button
             type="button"
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-primary transition-colors"
             onClick={toggleShowPassword}
             tabIndex={-1}
           >

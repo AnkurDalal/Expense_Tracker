@@ -11,10 +11,12 @@ import { addThousandSeparator } from '../../utils/helper';
 import RecentTransactions from '../../components/Dashboard/RecentTransactions.jsx';
 import FinanceOverview from '../../components/Dashboard/FinanceOverview.jsx';
 import toast from 'react-hot-toast';
+import { useTheme } from '../../context/ThemeContext';
 
 const Home = () => {
   useUserAuth();
   const navigate = useNavigate();
+  const { isDarkMode } = useTheme();
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -62,8 +64,8 @@ const Home = () => {
       <div className='container-custom'>
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back!</h1>
-          <p className="text-gray-600">Here's your financial overview for today</p>
+          <h1 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>Welcome back!</h1>
+          <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Here's your financial overview for today</p>
         </div>
 
         {/* Stats Cards Grid */}
@@ -74,18 +76,21 @@ const Home = () => {
             value={addThousandSeparator(dashboardData?.summary?.totalBalance || 0)}
             color="bg-gradient-to-br from-primary to-purple-600"
             trend={dashboardData?.summary?.savingsRate}
+            isDarkMode={isDarkMode}
           />
           <InfoCard
             icon={<LuWalletMinimal />}
             label="Total Income"
             value={addThousandSeparator(dashboardData?.summary?.totalIncome || 0)}
             color="bg-gradient-to-br from-green-500 to-emerald-600"
+            isDarkMode={isDarkMode}
           />
           <InfoCard
             icon={<LuHandCoins />}
             label="Total Expenses"
             value={addThousandSeparator(dashboardData?.summary?.totalExpense || 0)}
             color="bg-gradient-to-br from-red-500 to-pink-600"
+            isDarkMode={isDarkMode}
           />
         </div>
 
@@ -110,7 +115,11 @@ const Home = () => {
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
           <button 
             onClick={() => navigate("/income")}
-            className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
+            className={`p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group ${
+              isDarkMode 
+                ? 'bg-gradient-to-r from-green-600 to-emerald-700 text-white' 
+                : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
+            }`}
           >
             <div className="flex items-center justify-between">
               <div>
@@ -125,7 +134,11 @@ const Home = () => {
           
           <button 
             onClick={() => navigate("/expense")}
-            className="bg-gradient-to-r from-red-500 to-pink-600 text-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
+            className={`p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group ${
+              isDarkMode 
+                ? 'bg-gradient-to-r from-red-600 to-pink-700 text-white' 
+                : 'bg-gradient-to-r from-red-500 to-pink-600 text-white'
+            }`}
           >
             <div className="flex items-center justify-between">
               <div>
@@ -140,7 +153,11 @@ const Home = () => {
           
           <button 
             onClick={() => navigate("/reports")}
-            className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
+            className={`p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group ${
+              isDarkMode 
+                ? 'bg-gradient-to-r from-blue-600 to-cyan-700 text-white' 
+                : 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white'
+            }`}
           >
             <div className="flex items-center justify-between">
               <div>

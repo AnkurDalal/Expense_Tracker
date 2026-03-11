@@ -1,11 +1,13 @@
 
 import React from "react";
-//import CARD_2 from "../../assets/images/card2.png";
 import { LuTrendingUpDown, LuWallet, LuCreditCard } from "react-icons/lu";
+import { useTheme } from "../../context/ThemeContext";
 
 export const AuthLayout = ({ children }) => {
+  const { isDarkMode } = useTheme();
+
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+    <div className={`flex min-h-screen ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-gray-50 via-white to-gray-100'}`}>
 
       {/* Left Section */}
       <div className="w-full md:w-[60vw] px-8 sm:px-12 pt-8 pb-12 flex flex-col justify-center">
@@ -15,10 +17,10 @@ export const AuthLayout = ({ children }) => {
               <LuWallet className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent">
                 Expense Tracker
               </h1>
-              <p className="text-sm text-gray-600">Smart financial management made simple</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Smart financial management made simple</p>
             </div>
           </div>
           {children}
@@ -26,7 +28,9 @@ export const AuthLayout = ({ children }) => {
       </div>
 
       {/* Right Section */}
-      <div className="hidden md:block relative w-[40vw] bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 overflow-hidden">
+      <div className="hidden md:block relative w-[40vw] overflow-hidden">
+        {/* Background gradient based on theme */}
+        <div className={`absolute inset-0 ${isDarkMode ? 'bg-gradient-to-br from-violet-900/50 via-purple-900/50 to-pink-900/50' : 'bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50'}`}></div>
         
         {/* Decorative shapes */}
         <div className="absolute -top-10 -left-10 w-64 h-64 bg-gradient-to-br from-primary/30 to-transparent rounded-full blur-3xl"></div>
@@ -42,6 +46,7 @@ export const AuthLayout = ({ children }) => {
               value="430,000"
               color="from-primary to-purple-600"
               trend="+12.5%"
+              isDarkMode={isDarkMode}
             />
             <StatsInfoCard
               icon={<LuCreditCard className="w-6 h-6" />}
@@ -49,6 +54,7 @@ export const AuthLayout = ({ children }) => {
               value="12,500"
               color="from-red-500 to-pink-500"
               trend="-3.2%"
+              isDarkMode={isDarkMode}
             />
             <StatsInfoCard
               icon={
@@ -60,11 +66,10 @@ export const AuthLayout = ({ children }) => {
               value="24%"
               color="from-green-500 to-emerald-500"
               trend="+2.1%"
+              isDarkMode={isDarkMode}
             />
           </div>
         </div>
-
-        
 
         {/* Floating elements */}
         <div className="absolute top-20 left-10 w-4 h-4 bg-primary/20 rounded-full animate-bounce-slow"></div>
@@ -75,25 +80,25 @@ export const AuthLayout = ({ children }) => {
   );
 };
 
-const StatsInfoCard = ({ icon, label, value, color, trend }) => {
+const StatsInfoCard = ({ icon, label, value, color, trend, isDarkMode }) => {
   return (
-    <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-200/50 hover:shadow-2xl hover:shadow-gray-300/30 transition-all duration-300 hover:-translate-y-1">
+    <div className={`bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-2xl shadow-xl ${isDarkMode ? 'shadow-gray-900/50 border-gray-700/50 hover:shadow-gray-800/30' : 'shadow-gray-200/50 border-gray-200/50 hover:shadow-gray-300/30'} border transition-all duration-300 hover:-translate-y-1`}>
       <div className="flex items-center justify-between mb-4">
         <div className={`w-14 h-14 bg-gradient-to-br ${color} rounded-xl flex items-center justify-center shadow-lg shadow-black/10`}>
           {icon}
         </div>
         <div className="text-right">
-          <p className="text-xs text-gray-500">This month</p>
-          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+          <p className="text-xs text-gray-500 dark:text-gray-400">This month</p>
+          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800">
             {trend}
           </span>
         </div>
       </div>
       <div>
-        <h6 className="text-sm font-medium text-gray-600 mb-2">{label}</h6>
+        <h6 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">{label}</h6>
         <div className="flex items-end gap-2">
-          <span className="text-2xl font-bold text-gray-900 tracking-tight">₹{value}</span>
-          <span className="text-sm text-gray-500 mb-1">INR</span>
+          <span className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">₹{value}</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400 mb-1">INR</span>
         </div>
       </div>
     </div>

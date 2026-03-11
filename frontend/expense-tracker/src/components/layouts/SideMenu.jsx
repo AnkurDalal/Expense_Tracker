@@ -24,7 +24,7 @@ const SideMenu = ({ activeMenu }) => {
     }
 
     return (
-        <div className='w-64 h-[calc(100vh-77px)] bg-gradient-to-b from-white to-gray-50 border-r border-gray-200/50 p-6 sticky top-[77px] z-30 shadow-sm'>
+        <div className='w-64 h-[calc(100vh-77px)] bg-gradient-to-b from-white to-surface-2 border-r border-border p-6 sticky top-[77px] z-30 shadow-sm dark:from-surface dark:to-surface-2'>
             <div className='flex flex-col items-center justify-center gap-4 mt-2 mb-8'>
                 {user?.profileImageUrl ? (
                     <img
@@ -41,8 +41,8 @@ const SideMenu = ({ activeMenu }) => {
                     />
                 )}
                 <div className="text-center">
-                    <h5 className='text-lg font-bold text-gray-900'>{user?.fullName || "Guest"}</h5>
-                    <p className='text-sm text-gray-600'>{user?.email || "Not logged in"}</p>
+                    <h5 className='text-lg font-bold text-text-primary'>{user?.fullName || "Guest"}</h5>
+                    <p className='text-sm text-text-secondary'>{user?.email || "Not logged in"}</p>
                 </div>
             </div>
 
@@ -57,7 +57,7 @@ const SideMenu = ({ activeMenu }) => {
                             className={`w-full flex items-center gap-4 text-sm font-medium transition-all duration-200 ${
                                 isActive 
                                     ? "text-white bg-gradient-to-r from-primary to-purple-600 shadow-lg shadow-primary/20" 
-                                    : "text-gray-700 hover:text-primary hover:bg-primary/10"
+                                    : "text-text-primary hover:text-primary hover:bg-primary/10"
                             } py-3 px-4 rounded-xl`}
                             onClick={() => handleClick(item.path)}
                         >
@@ -68,9 +68,9 @@ const SideMenu = ({ activeMenu }) => {
                 })}
             </nav>
 
-            <div className="mt-8 pt-6 border-t border-gray-200/50">
+            <div className="mt-8 pt-6 border-t border-border">
                 <button
-                    className="w-full flex items-center gap-4 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-all duration-200 py-3 px-4 rounded-xl"
+                    className="w-full flex items-center gap-4 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/30 transition-all duration-200 py-3 px-4 rounded-xl"
                     onClick={handleLogout}
                 >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

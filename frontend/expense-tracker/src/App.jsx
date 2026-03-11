@@ -47,12 +47,14 @@ import Income from './pages/Dashboard/Income'
 import IncomeEdit from './pages/Dashboard/IncomeEdit'
 import Reports from './pages/Dashboard/Reports'
 import UserProvider from './context/UserContext'
+import { ThemeProvider } from './context/ThemeContext'
 
 const App = () => {
   return (
-    <UserProvider>
-      <Router>
-        <Routes>
+    <ThemeProvider>
+      <UserProvider>
+        <Router>
+          <Routes>
           <Route path="/" element={<Root />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signUp" element={<SignUp />} />
@@ -64,9 +66,10 @@ const App = () => {
           <Route path="/expense" element={<PrivateRoute><Expense /></PrivateRoute>} />
           <Route path="/expense/edit/:id" element={<PrivateRoute><ExpenseEdit /></PrivateRoute>} />
           <Route path="/reports" element={<PrivateRoute><Reports /></PrivateRoute>} />
-        </Routes>
-      </Router>
-    </UserProvider>
+          </Routes>
+        </Router>
+      </UserProvider>
+    </ThemeProvider>
   )
 }
 

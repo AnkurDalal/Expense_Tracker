@@ -9,10 +9,12 @@ import toast from 'react-hot-toast'
 import { IoMdAdd } from "react-icons/io"
 import { MdDelete } from "react-icons/md"
 import { FaEdit } from "react-icons/fa"
+import { useTheme } from '../../context/ThemeContext'
 
 const Income = () => {
   useUserAuth()
   const navigate = useNavigate()
+  const { isDarkMode } = useTheme()
   const [incomes, setIncomes] = useState([])
   const [loading, setLoading] = useState(false)
   const [showAddForm, setShowAddForm] = useState(false)
@@ -137,12 +139,16 @@ const Income = () => {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Income Management</h1>
-              <p className="text-gray-600">Track and manage your income sources</p>
+              <h1 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-2`}>Income Management</h1>
+              <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Track and manage your income sources</p>
             </div>
             <button
               onClick={() => setShowAddForm(!showAddForm)}
-              className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex items-center gap-2"
+              className={`px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex items-center gap-2 ${
+                isDarkMode 
+                  ? 'bg-gradient-to-r from-green-600 to-emerald-700 text-white' 
+                  : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
+              }`}
             >
               <IoMdAdd size={20} />
               Add Income
@@ -152,28 +158,38 @@ const Income = () => {
 
         {/* Add Income Form */}
         {showAddForm && (
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-gray-100">
-            <h2 className="text-xl font-semibold mb-4">Add New Income</h2>
+          <div className={`rounded-2xl shadow-lg p-6 mb-8 border ${
+            isDarkMode ? 'bg-gray-800 border-gray-700/50' : 'bg-white border-gray-100'
+          }`}>
+            <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Add New Income</h2>
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Source</label>
+                <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Source</label>
                 <input
                   type="text"
                   value={formData.source}
                   onChange={(e) => setFormData({...formData, source: e.target.value})}
-                  className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:border-primary transition-colors"
+                  className={`w-full border-2 rounded-lg px-4 py-2 focus:outline-none focus:border-primary transition-colors ${
+                    isDarkMode 
+                      ? 'bg-gray-700 border-gray-600 text-white focus:border-primary' 
+                      : 'bg-white border-gray-200 text-gray-900 focus:border-primary'
+                  }`}
                   placeholder="e.g., Salary, Freelance, Investment"
                 />
                 {formErrors.source && <p className="text-red-600 text-sm">{formErrors.source}</p>}
               </div>
               
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Amount</label>
+                <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Amount</label>
                 <input
                   type="number"
                   value={formData.amount}
                   onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                  className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:border-primary transition-colors"
+                  className={`w-full border-2 rounded-lg px-4 py-2 focus:outline-none focus:border-primary transition-colors ${
+                    isDarkMode 
+                      ? 'bg-gray-700 border-gray-600 text-white focus:border-primary' 
+                      : 'bg-white border-gray-200 text-gray-900 focus:border-primary'
+                  }`}
                   placeholder="0.00"
                   min="0"
                   step="0.01"
@@ -182,21 +198,28 @@ const Income = () => {
               </div>
               
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Date</label>
+                <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Date</label>
                 <input
                   type="date"
                   value={formData.date}
                   onChange={(e) => setFormData({...formData, date: e.target.value})}
-                  className="w-full bg-white border-2 border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:border-primary transition-colors"
+                  className={`w-full border-2 rounded-lg px-4 py-2 focus:outline-none focus:border-primary transition-colors ${
+                    isDarkMode 
+                      ? 'bg-gray-700 border-gray-600 text-white focus:border-primary' 
+                      : 'bg-white border-gray-200 text-gray-900 focus:border-primary'
+                  }`}
                 />
                 {formErrors.date && <p className="text-red-600 text-sm">{formErrors.date}</p>}
               </div>
               
-              
               <div className="md:col-span-2 flex gap-4">
                 <button
                   type="submit"
-                  className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-2 rounded-lg hover:shadow-lg transition-all duration-300"
+                  className={`px-6 py-2 rounded-lg hover:shadow-lg transition-all duration-300 ${
+                    isDarkMode 
+                      ? 'bg-gradient-to-r from-green-600 to-emerald-700 text-white' 
+                      : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
+                  }`}
                 >
                   Add Income
                 </button>
@@ -207,7 +230,11 @@ const Income = () => {
                     setFormData({ source: '', amount: '', date: '' })
                     setFormErrors({})
                   }}
-                  className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors"
+                  className={`px-6 py-2 rounded-lg transition-colors ${
+                    isDarkMode 
+                      ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
                 >
                   Cancel
                 </button>
@@ -217,40 +244,50 @@ const Income = () => {
         )}
 
         {/* Summary Card */}
-        <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 rounded-2xl mb-8 shadow-lg">
+        <div className={`p-6 rounded-2xl mb-8 shadow-lg ${
+          isDarkMode 
+            ? 'bg-gradient-to-r from-green-600 to-emerald-700 text-white' 
+            : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
+        }`}>
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold mb-1">Total Income</h3>
-              <p className="text-green-100">All income sources combined</p>
+              <p className={`${isDarkMode ? 'text-green-200' : 'text-green-100'}`}>All income sources combined</p>
             </div>
             <div className="text-right">
               <p className="text-3xl font-bold">{addThousandSeparator(totalIncome)}</p>
-              <p className="text-green-100 text-sm">INR</p>
+              <p className={`${isDarkMode ? 'text-green-200' : 'text-green-100'} text-sm`}>INR</p>
             </div>
           </div>
         </div>
 
         {/* Income List */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-          <div className="p-6 border-b border-gray-100">
-            <h2 className="text-xl font-semibold">Income History</h2>
+        <div className={`rounded-2xl shadow-lg border overflow-hidden ${
+          isDarkMode 
+            ? 'bg-gray-800 border-gray-700/50' 
+            : 'bg-white border-gray-100'
+        }`}>
+          <div className={`p-6 border-b ${
+            isDarkMode ? 'border-gray-700/50' : 'border-gray-100'
+          }`}>
+            <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Income History</h2>
           </div>
           
           {loading ? (
             <div className="p-8 text-center">
               <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-              <p className="text-gray-600 mt-4">Loading incomes...</p>
+              <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-4`}>Loading incomes...</p>
             </div>
           ) : incomes.length === 0 ? (
             <div className="p-8 text-center">
-              <div className="text-gray-400 mb-2">No income records found</div>
-              <p className="text-gray-500 text-sm">Add your first income to get started</p>
+              <div className={`${isDarkMode ? 'text-gray-400' : 'text-gray-400'} mb-2`}>No income records found</div>
+              <p className={`${isDarkMode ? 'text-gray-500' : 'text-gray-500'} text-sm`}>Add your first income to get started</p>
             </div>
           ) : (
             <>
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50">
+                  <thead className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
@@ -258,28 +295,34 @@ const Income = () => {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className={`${isDarkMode ? 'bg-gray-800 divide-y divide-gray-700/50' : 'bg-white divide-y divide-gray-200'}`}>
                     {incomes.map((income) => (
-                      <tr key={income._id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <tr key={income._id} className={`${isDarkMode ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50'} transition-colors`}>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${
+                          isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>
                           {income.source}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-semibold">
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm font-semibold ${
+                          isDarkMode ? 'text-green-400' : 'text-green-600'
+                        }`}>
                           +{addThousandSeparator(income.amount)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${
+                          isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                        }`}>
                           {new Date(income.date).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                           <button
                             onClick={() => navigate(`/income/edit/${income._id}`)}
-                            className="text-blue-600 hover:text-blue-900 transition-colors"
+                            className={`${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-900'} transition-colors`}
                           >
                             <FaEdit size={16} />
                           </button>
                           <button
                             onClick={() => handleDelete(income._id)}
-                            className="text-red-600 hover:text-red-900 transition-colors"
+                            className={`${isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'} transition-colors`}
                           >
                             <MdDelete size={16} />
                           </button>
@@ -292,31 +335,43 @@ const Income = () => {
 
               {/* Pagination */}
               {pagination.totalPages > 1 && (
-                <div className="p-6 border-t border-gray-100">
+                <div className={`p-6 border-t ${
+                  isDarkMode ? 'border-gray-700/50' : 'border-gray-100'
+                }`}>
                   <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-700">
+                    <div className={`text-sm ${
+                      isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
                       Showing {((pagination.currentPage - 1) * 10) + 1} to {Math.min(pagination.currentPage * 10, pagination.totalItems)} of {pagination.totalItems} results
                     </div>
                     <div className="flex space-x-2">
                       <button
                         onClick={() => handlePageChange(pagination.currentPage - 1)}
                         disabled={!pagination.hasPrevPage}
-                        className={`px-4 py-2 rounded-lg border ${
+                        className={`px-4 py-2 rounded-lg border transition-colors ${
                           pagination.hasPrevPage 
-                            ? 'border-gray-300 hover:bg-gray-50 text-gray-700' 
-                            : 'border-gray-200 text-gray-400 cursor-not-allowed'
-                        } transition-colors`}
+                            ? isDarkMode 
+                              ? 'border-gray-600 hover:bg-gray-700 text-gray-300' 
+                              : 'border-gray-300 hover:bg-gray-50 text-gray-700' 
+                            : isDarkMode 
+                              ? 'border-gray-700/50 text-gray-500 cursor-not-allowed' 
+                              : 'border-gray-200 text-gray-400 cursor-not-allowed'
+                        }`}
                       >
                         Previous
                       </button>
                       <button
                         onClick={() => handlePageChange(pagination.currentPage + 1)}
                         disabled={!pagination.hasNextPage}
-                        className={`px-4 py-2 rounded-lg border ${
+                        className={`px-4 py-2 rounded-lg border transition-colors ${
                           pagination.hasNextPage 
-                            ? 'border-gray-300 hover:bg-gray-50 text-gray-700' 
-                            : 'border-gray-200 text-gray-400 cursor-not-allowed'
-                        } transition-colors`}
+                            ? isDarkMode 
+                              ? 'border-gray-600 hover:bg-gray-700 text-gray-300' 
+                              : 'border-gray-300 hover:bg-gray-50 text-gray-700' 
+                            : isDarkMode 
+                              ? 'border-gray-700/50 text-gray-500 cursor-not-allowed' 
+                              : 'border-gray-200 text-gray-400 cursor-not-allowed'
+                        }`}
                       >
                         Next
                       </button>

@@ -9,6 +9,7 @@ import { API_PATHS } from '../../utils/apiPaths';
 import uploadImage from '../../utils/uploadImage';
 import { UserContext } from '../../context/UserContext';
 import { useContext } from 'react';
+import { useTheme } from '../../context/ThemeContext';
 
 const SignUp = () => {
   const [profilePic, setProfilePic] = useState(null);
@@ -18,40 +19,56 @@ const SignUp = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [fullNameError, setFullNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
   const { updateUser } = useContext(UserContext);
+  const { isDarkMode } = useTheme();
   const navigate = useNavigate()
 
   const handleSignUp = async (e) => {
     e.preventDefault();
 
+    // Clear previous errors
+    setError("")
+    setFullNameError("")
+    setEmailError("")
+    setPasswordError("")
+    setConfirmPasswordError("")
+
     // Validation checks
+    let hasError = false
+
     if (!fullName.trim()) {
-      setError("Please enter your full name");
-      return;
+      setFullNameError("Please enter your full name");
+      hasError = true
     }
 
     if (!validateEmail(email)) {
-      setError("Please enter a valid email address");
-      return;
+      setEmailError("Please enter a valid email address");
+      hasError = true
     }
 
     if (!password) {
-      setError("Please enter a password");
-      return;
+      setPasswordError("Please enter a password");
+      hasError = true
+    } else if (password.length < 6) {
+      setPasswordError("Password must be at least 6 characters long");
+      hasError = true
     }
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters long");
-      return;
+    if (!confirmPassword) {
+      setConfirmPasswordError("Please confirm your password");
+      hasError = true
+    } else if (password !== confirmPassword) {
+      setConfirmPasswordError("Passwords do not match");
+      hasError = true
     }
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
+    if (hasError) return
 
-    setError("");
     setIsLoading(true);
 
     try {
@@ -108,8 +125,8 @@ const SignUp = () => {
     <AuthLayout>
       <div className='w-full max-w-lg mx-auto px-4 sm:px-6 h-auto md:h-full mt-10 md:mt-0 flex flex-col justify-center'>
         <div className="text-center mb-8">
-          <h1 className='text-3xl font-bold text-gray-900 mb-2'>Join Expense Tracker</h1>
-          <p className='text-sm text-gray-600'>
+          <h1 className='text-3xl font-bold text-text-primary mb-2'>Join Expense Tracker</h1>
+          <p className='text-sm text-text-secondary'>
             Create your account to start managing your finances today
           </p>
         </div>
@@ -120,20 +137,30 @@ const SignUp = () => {
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <Input
               value={fullName}
-              onChange={({ target }) => setFullName(target.value)}
+              onChange={({ target }) => {
+                setFullName(target.value)
+                if (fullNameError) setFullNameError("")
+              }}
               label="Full Name"
               placeholder="John Doe"
               type="text"
+              error={fullNameError}
               autoComplete="name"
+              isDarkMode={isDarkMode}
             />
 
             <Input
               value={email}
-              onChange={({ target }) => setEmail(target.value)}
+              onChange={({ target }) => {
+                setEmail(target.value)
+                if (emailError) setEmailError("")
+              }}
               label="Email Address"
               placeholder="john@example.com"
               type="email"
+              error={emailError}
               autoComplete="email"
+              isDarkMode={isDarkMode}
             />
           </div>
 
@@ -141,28 +168,38 @@ const SignUp = () => {
             <div className="relative">
               <Input
                 value={password}
-                onChange={({ target }) => setPassword(target.value)}
+                onChange={({ target }) => {
+                  setPassword(target.value)
+                  if (passwordError) setPasswordError("")
+                }}
                 label="Password"
                 placeholder="Create a strong password (min 6 characters)"
                 type="password"
+                error={passwordError}
                 autoComplete="new-password"
+                isDarkMode={isDarkMode}
               />
             </div>
             <div className="relative">
               <Input
                 value={confirmPassword}
-                onChange={({ target }) => setConfirmPassword(target.value)}
+                onChange={({ target }) => {
+                  setConfirmPassword(target.value)
+                  if (confirmPasswordError) setConfirmPasswordError("")
+                }}
                 label="Confirm Password"
                 placeholder="Re-enter your password to confirm"
                 type="password"
+                error={confirmPasswordError}
                 autoComplete="new-password"
+                isDarkMode={isDarkMode}
               />
             </div>
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-              <p className='text-red-600 text-sm'>{error}</p>
+            <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-red-900/20 border-red-800/50' : 'bg-red-50 border-red-200'}`}>
+              <p className={`text-sm ${isDarkMode ? 'text-red-300' : 'text-red-600'}`}>{error}</p>
             </div>
           )}
 
@@ -190,19 +227,19 @@ const SignUp = () => {
           </button>
 
           <div className="text-center space-y-2">
-            <p className='text-sm text-gray-600'>
+            <p className='text-sm text-text-secondary'>
               Already have an account?
               <Link className='font-medium text-primary hover:text-primary/80 transition-colors ml-1' to='/login'>
                 Sign In
               </Link>
             </p>
-            <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+            <div className="flex items-center justify-center gap-2 text-xs text-text-secondary">
               <span>By signing up, you agree to our</span>
-              <Link className='hover:text-gray-700 transition-colors' to='/terms'>
+              <Link className='hover:text-text-primary transition-colors' to='/terms'>
                 Terms
               </Link>
               <span>and</span>
-              <Link className='hover:text-gray-700 transition-colors' to='/privacy'>
+              <Link className='hover:text-text-primary transition-colors' to='/privacy'>
                 Privacy Policy
               </Link>
             </div>
