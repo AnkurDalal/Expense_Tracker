@@ -42,7 +42,10 @@ import Login from './pages/Auth/Login'
 import SignUp from './pages/Auth/SignUp'
 import Home from './pages/Dashboard/Home'
 import Expense from './pages/Dashboard/Expense'
+import ExpenseEdit from './pages/Dashboard/ExpenseEdit'
 import Income from './pages/Dashboard/Income'
+import IncomeEdit from './pages/Dashboard/IncomeEdit'
+import Reports from './pages/Dashboard/Reports'
 import UserProvider from './context/UserContext'
 
 const App = () => {
@@ -57,7 +60,10 @@ const App = () => {
           {/* Protected Routes */}
           <Route path="/dashboard" element={<PrivateRoute><Home /></PrivateRoute>} />
           <Route path="/income" element={<PrivateRoute><Income /></PrivateRoute>} />
+          <Route path="/income/edit/:id" element={<PrivateRoute><IncomeEdit /></PrivateRoute>} />
           <Route path="/expense" element={<PrivateRoute><Expense /></PrivateRoute>} />
+          <Route path="/expense/edit/:id" element={<PrivateRoute><ExpenseEdit /></PrivateRoute>} />
+          <Route path="/reports" element={<PrivateRoute><Reports /></PrivateRoute>} />
         </Routes>
       </Router>
     </UserProvider>

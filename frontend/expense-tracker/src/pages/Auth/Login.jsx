@@ -77,60 +77,77 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   const { updateUser } = useContext(UserContext);
-
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     if (!validateEmail(email)) {
-      setError("please enter a valid email address.")
+      setError("Please enter a valid email address.")
       return;
     }
 
     if (!password) {
-      setError("please enter the password.")
+      setError("Please enter your password.")
       return;
     }
 
     setError("")
-    //login api call
+    setIsLoading(true)
+    
     try {
       const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, {
         email,
         password
       })
-      const { token, user } = response.data;
-      if (token) {
-        localStorage.setItem("token", token);
-        updateUser(user);
-        navigate("/dashboard")
+      
+      if (response.data && response.data.success && response.data.data) {
+        const { token, fullName, email: userEmail, profileImageUrl } = response.data.data;
+        if (token) {
+          localStorage.setItem("token", token);
+          updateUser({
+            _id: response.data.data._id,
+            fullName,
+            email: userEmail,
+            profileImageUrl
+          });
+          navigate("/dashboard")
+        }
+      } else {
+        setError("Invalid login response")
       }
     } catch (error) {
-      if (error.response && error.response.data.message) {
+      if (error.response && error.response.data && error.response.data.message) {
         setError(error.response.data.message)
+      } else if (error.response && error.response.data && error.response.data.errors) {
+        setError(error.response.data.errors.map(err => err.message).join(', '))
       } else {
         setError("Something went wrong. Please try again.")
       }
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
     <AuthLayout>
       <div className='w-full max-w-md mx-auto px-4 sm:px-6 h-auto md:h-full mt-10 md:mt-0 flex flex-col justify-center'>
-        <h3 className='text-xl font-semibold text-black'>Welcome Back</h3>
-        <p className='text-xs text-slate-700 mt-[5px] mb-6'>
-          Please enter your details to log in
-        </p>
+        <div className="text-center mb-8">
+          <h1 className='text-3xl font-bold text-gray-900 mb-2'>Welcome Back</h1>
+          <p className='text-sm text-gray-600'>
+            Sign in to your account to continue managing your finances
+          </p>
+        </div>
 
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleLogin} className="space-y-6">
           <Input
             value={email}
             onChange={({ target }) => setEmail(target.value)}
             label="Email Address"
-            placeholder="john@example.com"
+            placeholder="Enter your email address"
             type="email"
           />
 
@@ -138,20 +155,53 @@ const Login = () => {
             value={password}
             onChange={({ target }) => setPassword(target.value)}
             label="Password"
-            placeholder="Min 8 Characters"
+            placeholder="Enter your password"
             type="password"
           />
 
-          {error && <p className='text-red-500 text-xs pb-2.5'>{error}</p>}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <p className='text-red-600 text-sm'>{error}</p>
+            </div>
+          )}
 
-          <button type="submit" className='btn-primary w-full'>LOGIN</button>
+          <button 
+            type="submit" 
+            className={`group relative w-full overflow-hidden bg-gradient-to-r from-primary to-purple-600 text-white py-4 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 ${isLoading ? 'opacity-75 cursor-not-allowed' : 'hover:scale-105'}`}
+            disabled={isLoading}
+          >
+            <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+            <span className="relative flex items-center justify-center gap-3">
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Signing In...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                  </svg>
+                  <span>SIGN IN</span>
+                </>
+              )}
+            </span>
+          </button>
 
-          <p className='text-[13px] text-slate-800 mt-3'>
-            Don't have an account?
-            <Link className='font-medium text-primary underline ml-1' to='/signup'>
-              SignUp
+          <div className="text-center space-y-2">
+            <p className='text-sm text-gray-600'>
+              Don't have an account?
+              <Link className='font-medium text-primary hover:text-primary/80 transition-colors ml-1' to='/signup'>
+                Create Account
+              </Link>
+            </p>
+            <Link 
+              className='text-xs text-gray-500 hover:text-gray-700 transition-colors' 
+              to='/forgot-password'
+            >
+              Forgot your password?
             </Link>
-          </p>
+          </div>
         </form>
       </div>
     </AuthLayout>

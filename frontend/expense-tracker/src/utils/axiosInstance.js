@@ -14,10 +14,16 @@ const axiosInstance = axios.create({
 // REQUEST INTERCEPTOR 
 axiosInstance.interceptors.request.use(
     (config) => {
-        const accessToken = localStorage.getItem("token");
+        // Don't add auth headers for auth endpoints (login, register)
+        const authEndpoints = ['/api/v1/auth/login', '/api/v1/auth/register'];
+        const isAuthEndpoint = authEndpoints.some(endpoint => config.url?.includes(endpoint));
+        
+        if (!isAuthEndpoint) {
+            const accessToken = localStorage.getItem("token");
 
-        if (accessToken) {
-            config.headers.Authorization = `Bearer ${accessToken}`;
+            if (accessToken) {
+                config.headers.Authorization = `Bearer ${accessToken}`;
+            }
         }
 
         return config;

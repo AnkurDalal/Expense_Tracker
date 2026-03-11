@@ -3,7 +3,8 @@ import {
   LuHandCoins,
   LuWalletMinimal,
   LuLogOut
-} from "react-icons/lu"
+} from "react-icons/lu";
+import { FiBarChart2 } from "react-icons/fi";
 
 export const SIDE_MENU_DATA = [
   {
@@ -26,8 +27,8 @@ export const SIDE_MENU_DATA = [
   },
   {
     id: "04",
-    label: "Logout",
-    icon: LuLogOut,
-    path: "/logout"
+    label: "Reports",
+    icon: FiBarChart2,
+    path: "/reports"
   }
-]
+];

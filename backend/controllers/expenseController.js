@@ -1,20 +1,13 @@
-
 const Expense = require("../models/Expense.js");
 const xlsx = require("xlsx");
 const path = require("path");
 const fs = require("fs");
 
-
-// ADD EXPENSE 
+// Add expense
 exports.addExpense = async (req, res) => {
-    const userId = req.user.id;
-
     try {
+        const userId = req.user.id;
         const { icon, category, amount, date } = req.body;
-
-        if (!category || !amount || !date) {
-            return res.status(400).json({ message: "All fields are required!" });
-        }
 
         const newExpense = new Expense({
             userId,
@@ -26,65 +19,254 @@ exports.addExpense = async (req, res) => {
 
         await newExpense.save();
 
-        res.status(200).json({ newExpense });
+        res.status(201).json({
+            success: true,
+            message: "Expense added successfully",
+            data: newExpense
+        });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Server Error" });
+        console.error('Add expense error:', error);
+        res.status(500).json({ 
+            success: false,
+            message: "Error adding expense" 
+        });
     }
 };
 
-
-// GET ALL EXPENSE
+// Get all expenses with pagination and filtering
 exports.getAllExpense = async (req, res) => {
     try {
-        if (!req.user || !req.user.id) {
-            return res.status(401).json({ message: "Unauthorized" });
+        const userId = req.user.id;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+        
+        // Date filtering
+        const { startDate, endDate } = req.query;
+        const dateFilter = {};
+        
+        if (startDate && endDate) {
+            dateFilter.$gte = new Date(startDate);
+            dateFilter.$lte = new Date(endDate);
+        } else if (startDate) {
+            dateFilter.$gte = new Date(startDate);
+        } else if (endDate) {
+            dateFilter.$lte = new Date(endDate);
         }
 
-        const expenses = await Expense.find({ userId: req.user.id })
-            .sort({ date: -1 });
+        const query = { userId };
+        if (Object.keys(dateFilter).length > 0) {
+            query.date = dateFilter;
+        }
 
-        res.status(200).json(expenses);
+        const [expenses, totalCount] = await Promise.all([
+            Expense.find(query)
+                .sort({ date: -1 })
+                .skip(skip)
+                .limit(limit),
+            Expense.countDocuments(query)
+        ]);
+
+        res.status(200).json({
+            success: true,
+            data: {
+                expenses,
+                pagination: {
+                    currentPage: page,
+                    totalPages: Math.ceil(totalCount / limit),
+                    totalItems: totalCount,
+                    itemsPerPage: limit,
+                    hasNextPage: page < Math.ceil(totalCount / limit),
+                    hasPrevPage: page > 1
+                }
+            }
+        });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Server Error" });
+        console.error('Get all expenses error:', error);
+        res.status(500).json({ 
+            success: false,
+            message: "Error fetching expenses" 
+        });
     }
 };
 
-
-// DELETE EXPENSE
-exports.deleteExpense = async (req, res) => {
+// Get expense by ID
+exports.getExpenseById = async (req, res) => {
     try {
-        const expense = await Expense.findById(req.params.id);
+        const userId = req.user.id;
+        const expenseId = req.params.id;
+
+        const expense = await Expense.findOne({ _id: expenseId, userId });
 
         if (!expense) {
-            return res.status(404).json({ message: "Expense not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Expense not found"
+            });
         }
 
-        if (expense.userId.toString() !== req.user.id) {
-            return res.status(401).json({ message: "Not authorized" });
+        res.status(200).json({
+            success: true,
+            data: expense
+        });
+
+    } catch (error) {
+        console.error('Get expense by ID error:', error);
+        res.status(500).json({ 
+            success: false,
+            message: "Error fetching expense" 
+        });
+    }
+};
+
+// Update expense
+exports.updateExpense = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const expenseId = req.params.id;
+        const { icon, category, amount, date } = req.body;
+
+        const expense = await Expense.findOne({ _id: expenseId, userId });
+
+        if (!expense) {
+            return res.status(404).json({
+                success: false,
+                message: "Expense not found"
+            });
+        }
+
+        // Update fields
+        if (icon !== undefined) expense.icon = icon;
+        if (category !== undefined) expense.category = category;
+        if (amount !== undefined) expense.amount = amount;
+        if (date !== undefined) expense.date = new Date(date);
+
+        await expense.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Expense updated successfully",
+            data: expense
+        });
+
+    } catch (error) {
+        console.error('Update expense error:', error);
+        res.status(500).json({ 
+            success: false,
+            message: "Error updating expense" 
+        });
+    }
+};
+
+// Delete expense
+exports.deleteExpense = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const expenseId = req.params.id;
+
+        const expense = await Expense.findOne({ _id: expenseId, userId });
+
+        if (!expense) {
+            return res.status(404).json({
+                success: false,
+                message: "Expense not found"
+            });
         }
 
         await expense.deleteOne();
 
-        res.json({ message: "Expense deleted successfully" });
+        res.status(200).json({
+            success: true,
+            message: "Expense deleted successfully"
+        });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Server Error" });
+        console.error('Delete expense error:', error);
+        res.status(500).json({ 
+            success: false,
+            message: "Error deleting expense" 
+        });
     }
 };
 
+// Get expense summary
+exports.getExpenseSummary = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { startDate, endDate } = req.query;
 
-// DOWNLOAD EXPENSE EXCEL 
+        const dateFilter = {};
+        if (startDate && endDate) {
+            dateFilter.$gte = new Date(startDate);
+            dateFilter.$lte = new Date(endDate);
+        }
+
+        const query = { userId };
+        if (Object.keys(dateFilter).length > 0) {
+            query.date = dateFilter;
+        }
+
+        const summary = await Expense.aggregate([
+            { $match: query },
+            {
+                $group: {
+                    _id: null,
+                    totalExpense: { $sum: "$amount" },
+                    averageExpense: { $avg: "$amount" },
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        const byCategory = await Expense.aggregate([
+            { $match: query },
+            {
+                $group: {
+                    _id: "$category",
+                    total: { $sum: "$amount" },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { total: -1 } }
+        ]);
+
+        res.status(200).json({
+            success: true,
+            data: {
+                summary: summary[0] || { totalExpense: 0, averageExpense: 0, count: 0 },
+                byCategory
+            }
+        });
+
+    } catch (error) {
+        console.error('Get expense summary error:', error);
+        res.status(500).json({ 
+            success: false,
+            message: "Error fetching expense summary" 
+        });
+    }
+};
+
+// Download expense Excel
 exports.downloadExpenseExcel = async (req, res) => {
     try {
         const userId = req.user.id;
+        const { startDate, endDate } = req.query;
 
-        const expenses = await Expense.find({ userId })
-            .sort({ date: -1 });
+        const dateFilter = {};
+        if (startDate && endDate) {
+            dateFilter.$gte = new Date(startDate);
+            dateFilter.$lte = new Date(endDate);
+        }
+
+        const query = { userId };
+        if (Object.keys(dateFilter).length > 0) {
+            query.date = dateFilter;
+        }
+
+        const expenses = await Expense.find(query).sort({ date: -1 });
 
         const data = expenses.map(item => ({
             Category: item.category,
@@ -108,10 +290,21 @@ exports.downloadExpenseExcel = async (req, res) => {
         xlsx.writeFile(wb, filePath);
 
         // Download file
-        res.download(filePath);
+        res.download(filePath, 'Expense_details.xlsx', (err) => {
+            if (err) {
+                console.error('Download error:', err);
+                res.status(500).json({ 
+                    success: false,
+                    message: "Error downloading file" 
+                });
+            }
+        });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Server Error" });
+        console.error('Download expense Excel error:', error);
+        res.status(500).json({ 
+            success: false,
+            message: "Error downloading expense data" 
+        });
     }
 };

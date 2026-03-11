@@ -17,9 +17,9 @@ const TransactionsInfoCard = ({
             : "bg-red-50 text-red-500"
 
     return (
-        <div className='group relative flex items-center gap-4 mt-2 p-3 rounded-lg hover:bg-gray-100/60'>
+<div className='group relative flex items-center gap-4 mt-2 p-4 rounded-xl hover:bg-gray-50/80 transition-all duration-200 border border-gray-100/50 hover:border-gray-200/50'>
 
-            <div className='w-12 h-12 flex items-center justify-center text-xl text-gray-800 bg-gray-100 rounded-full'>
+<div className='w-14 h-14 flex items-center justify-center text-xl text-gray-800 bg-gray-50 rounded-xl shadow-sm'>
                 {icon ? (
                     <img src={icon} alt={title} className='w-6 h-6' />
                 ) : (
@@ -29,26 +29,37 @@ const TransactionsInfoCard = ({
 
             <div className='flex-1 flex items-center justify-between'>
                 <div>
-                    <p className='text-sm text-gray-700 font-medium'>{title}</p>
+<p className='text-sm font-semibold text-gray-900 group-hover:text-gray-800 transition-colors'>
+                        {title}
+                    </p>
                     <p className='text-xs text-gray-400 mt-1'>{date}</p>
                 </div>
 
                 <div className='flex items-center gap-2'>
 
                     {!hideDeleteBtn && (
-                        <button
-                            className='text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer'
+<button
+                            className='text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100'
                             onClick={onDelete}
+                            title="Delete transaction"
                         >
                             <LuTrash2 size={18} />
                         </button>
                     )}
 
-                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-md ${getAmountStyles()}`}>
-                        <h6 className='text-xs font-medium'>
-                            {type === "income" ? "+" : "-"}${amount}
-                        </h6>
-                        {type === "income" ? <LuTrendingUp /> : <LuTrendingDown />}
+                    <div className={`flex items-center gap-3 px-4 py-2 rounded-lg ${getAmountStyles()} border`}>
+                        <span className='text-sm font-bold tracking-wide'>
+                            {type === "income" ? "+" : "-"}₹{new Intl.NumberFormat('en-IN').format(amount)}
+                        </span>
+                        {type === "income" ? (
+                            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                                <LuTrendingUp size={16} />
+                            </div>
+                        ) : (
+                            <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center text-red-600">
+                                <LuTrendingDown size={16} />
+                            </div>
+                        )}
                     </div>
 
                 </div>
