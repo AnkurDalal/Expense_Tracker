@@ -61,9 +61,6 @@ app.use(
   })
 );
 
-// Handle preflight requests
-app.options("*", cors());
-
 // Rate limiting
 app.use("/api/v1/auth", authRateLimit);
 app.use("/api/v1", generalRateLimit);
